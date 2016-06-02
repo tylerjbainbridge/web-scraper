@@ -3,7 +3,6 @@ var request = require('request'),
 
 function WebScraper(url){
     this.url = url;
-    this.request = request;
     this.movieInfo = {
         title: "",
         release: "",
@@ -12,8 +11,25 @@ function WebScraper(url){
     };
 }
 
+/**
+ *
+ * callback:
+ *
+ * (err, html) => {
+ *      if(err)
+ *          //kill process? handle error?
+ *      else
+ *          WebScraperInstance.getData(html);
+ *          appendtream(WSI.getInfo());
+ * }
+ *
+ *
+ * @param callback
+ */
+
 WebScraper.prototype.requestUrl = function(callback){
-    this.request(this.url, function(err, response, html){
+
+    request(this.url, function(err, response, html){
        if(err){
            callback(err);
        }else{
@@ -23,9 +39,17 @@ WebScraper.prototype.requestUrl = function(callback){
 };
 
 
-WebScraper.prototype.getData = function(callback){
+
+
+WebScraper.prototype.getData = function(html){
     var $ = cheerio.load(html);
     var obj = this;
+
+    $('span[itemprop="ratingValue"]').filter(function(){
+        var data = $(this);
+        obj.movieInfo.rating = data.text();
+    });
+
 
     $('.title_wrapper').filter(function(){
         var data = $(this);
@@ -43,14 +67,16 @@ WebScraper.prototype.getData = function(callback){
             obj.movieInfo.MPAA = data.children().first().attr('content');
 
         });
+
     });
 
-    $('span[itemprop="ratingValue"]').filter(function(){
-        var data = $(this);
-        obj.movieInfo.rating = data.text();
-    });
+
     
     
+};
+
+WebScraper.prototype.getInfo = function(){
+    return this.movieInfo;
 };
 
 
