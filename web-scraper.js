@@ -1,17 +1,18 @@
 var request = require('request'),
     cheerio = require('cheerio');
 
-function WebScrapper(url){
+function WebScraper(url){
     this.url = url;
     this.request = request;
     this.movieInfo = {
         title: "",
         release: "",
-        rating: ""
+        rating: "",
+        MPAA: ""
     };
 }
 
-WebScrapper.prototype.requestUrl = function(callback){
+WebScraper.prototype.requestUrl = function(callback){
     this.request(this.url, function(err, response, html){
        if(err){
            callback(err);
@@ -21,49 +22,36 @@ WebScrapper.prototype.requestUrl = function(callback){
     });
 };
 
-WebScrapper.prototype.getData = function(callback){
+
+WebScraper.prototype.getData = function(callback){
     var $ = cheerio.load(html);
-    var that = this;
+    var obj = this;
 
     $('.title_wrapper').filter(function(){
         var data = $(this);
 
-        that.movieInfo.title = data.children().first().text().split('(')[0].trim();
-        that.movieInfo.release = data.children().first().children().first().find('a').text();
+        obj.movieInfo.title = data.children().first().text().split('(')[0].trim();
+        obj.movieInfo.release = data.children().first().children().first().find('a').text();
 
+
+        $('.subtext').filter(function(){
+
+            //subtext under title wrapper header
+            //contains rating, hours, genre, full release date
+            var data = $(this);
+
+            obj.movieInfo.MPAA = data.children().first().attr('content');
+
+        });
     });
 
     $('span[itemprop="ratingValue"]').filter(function(){
         var data = $(this);
-        that.movieInfo.rating = data.text();
+        obj.movieInfo.rating = data.text();
     });
     
     
 };
 
-request(url, function(err, response, html){
-    if(!err){
-        var $ = cheerio.load(html);
 
-        var title, release, rating;
-        var json = {title: "", release: "", rating: ""};
-
-        $('.title_wrapper').filter(function(){
-            var data = $(this);
-
-            title = data.children().first().text().split('(')[0].trim();
-            release = data.children().first().children().first().find('a').text();
-
-            json.title = title;
-            json.release = release;
-
-        });
-
-        $('span[itemprop="ratingValue"]').filter(function(){
-            var data = $(this);
-            json.rating = data.text();
-        });
-    }
-});
-
-module.exports = WebScrapper;
+module.exports = WebScraper;

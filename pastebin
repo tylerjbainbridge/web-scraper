@@ -1,14 +1,57 @@
-<script  type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" ></script>
+app.get('/scrape', function(req, res){
 
-<script type="text/javascript">/*<
+    var url = 'http://www.imdb.com/title/tt1431045/';
 
-![CDATA[*//*---->*
-/
+    //request call
+    //url is first param
+    //callback takes 3 params
+    //--------error
+    //--------response status code
+    //--------html
 
-$(document).ready(function(){
+    request(url, function(error, request, html){
+        //handle request errors
 
-    $("td").each(function(){
+        if(!error){
+            //cheerio library on html that is gotten
 
-        if($(this).attr("itemprop")=="productID") {
+            var $ = cheerio.load(html);
 
-                alert($(this).html()) } });});/*--*//*]]>*/</script>
+            //variables we will capture
+
+            var titleBuffer, title, release, rating;
+            var json = {
+                title: "",
+                release: "",
+                rating: ""
+            };
+
+            $('.title_wrapper').filter(function(){
+
+                //story header class
+                var data = $(this);
+
+                titleBuffer = data.children().first().text();
+
+
+                release = data.children().first().children().first().find('a').text();
+
+                title = titleBuffer.split('(')[0];
+
+                json.title = title.trim();
+                json.release = release;
+
+
+
+
+
+
+
+            });
+
+
+
+            console.log(json);
+
+        }
+    });
