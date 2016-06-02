@@ -43,20 +43,34 @@ app.get('/scrape', function(req, res){
                 titleBuffer = data.children().first().text();
 
 
-                release = titleBuffer.split('(')
-                    .filter(function(v){ return v.indexOf(')') > -1})
-                    .map( function(value) {
-                        return value.split(')')[0]
-                    })[0];
+                release = data.children().first().children().first().find('a').text();
 
                 title = titleBuffer.split('(')[0];
 
                 json.title = title.trim();
                 json.release = release;
 
-                console.log(json);
+                $('.subtext').filter(function(){
+
+                    //subtext under title wrapper header
+                    //contains rating, hours, genre, full release date
+                    var data = $(this);
+
+
+                    json.rating = data.children().first().attr('content');
+
+                });
+
+
+
+
+
 
             });
+
+
+
+            console.log(json);
 
         }
     });
