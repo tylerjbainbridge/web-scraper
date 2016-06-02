@@ -3,7 +3,7 @@ var parsedArgs = require('minimist')(process.argv.slice(2)),
 
 var url = parsedArgs.url;
 
-var WebScraper = require('./web-scraper.js');
+var WebScraper = require('./movie-scraper.js');
 var webScraper = new WebScraper(url);
 
 
@@ -12,7 +12,7 @@ webScraper.requestUrl(function(err, html){
         throw err;
     }else{
         webScraper.getData(html);
-        fs.appendFile('./message.txt', JSON.stringify(webScraper.getInfo()), function (err) {
+        fs.appendFile('./message.txt', JSON.stringify(webScraper.getInfo()) + '/n', function (err) {
             
         });
     }
