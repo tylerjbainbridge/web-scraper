@@ -26,9 +26,13 @@ ToplistScraper.prototype.scrapeTopList = function(callback) {
 
                     tempUrl = $(this).attr('href');
                     importUrl = homeUrl + tempUrl;
-                    allUrls[importUrl]
-                    newUrlArray.push(importUrl);
 
+                    typeof allUrls[importUrl] == 'undefined'? allUrls[importUrl] = 1 : allUrls[importUrl]++;
+
+                    if(allUrls[importUrl] == 1){
+                        newUrlArray.push(importUrl);
+                    }
+                    
                 });
 
             });
