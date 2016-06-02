@@ -1,14 +1,46 @@
 var request = require('request'),
     cheerio = require('cheerio');
 
-function webScrapper(url){
+function WebScrapper(url){
     this.url = url;
-    this.request = 
+    this.request = request;
+    this.movieInfo = {
+        title: "",
+        release: "",
+        rating: ""
+    };
+}
+
+WebScrapper.prototype.requestUrl = function(callback){
+    this.request(this.url, function(err, response, html){
+       if(err){
+           callback(err);
+       }else{
+           callback(err, html);
+       }
+    });
 };
 
-webScrapper.prototype.requestUrl = function(callback){
+WebScrapper.prototype.getData = function(callback){
+    var $ = cheerio.load(html);
+    var that = this;
+
+    $('.title_wrapper').filter(function(){
+        var data = $(this);
+
+        that.movieInfo.title = data.children().first().text().split('(')[0].trim();
+        that.movieInfo.release = data.children().first().children().first().find('a').text();
+
+    });
+
+    $('span[itemprop="ratingValue"]').filter(function(){
+        var data = $(this);
+        that.movieInfo.rating = data.text();
+    });
+    
     
 };
+
 request(url, function(err, response, html){
     if(!err){
         var $ = cheerio.load(html);
@@ -33,3 +65,5 @@ request(url, function(err, response, html){
         });
     }
 });
+
+module.exports = WebScrapper;
