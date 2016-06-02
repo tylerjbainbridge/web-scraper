@@ -17,20 +17,22 @@ ToplistScraper.prototype.scrapeTopList = function(callback) {
             var importUrl = "";
             var homeUrl = "http://www.imdb.com";
 
-            $('.lister').filter(function () {
+            $('.lister-list').filter(function () {
 
                 var data = $(this);
-
-                testLogger = data.children().find('a').each(function () {
+                var allUrls = {};
+                
+                data.children().find('a').each(function () {
 
                     tempUrl = $(this).attr('href');
                     importUrl = homeUrl + tempUrl;
+                    allUrls[importUrl]
                     newUrlArray.push(importUrl);
 
                 });
 
             });
-
+            
             callback(newUrlArray);
         }
     });
